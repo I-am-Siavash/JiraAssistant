@@ -1,0 +1,63 @@
+{
+  "name": "Prepare Jira Files Data",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "function cleanText(value) {\n    if (value == null) return '';\n\n    return String(value)\n        .replace(/\\r\\n?/g, '\\n')\n        .replace(/<br\\s*\\/?>/gi, '\\n')\n        .replace(/<\\/p>|<\\/li>|<\\/div>|<\\/tr>/gi, '\\n')\n        .replace(/<[^>]*>/g, ' ')\n        .replace(/\\[~[^\\]]+\\]/g, '')\n        .replace(/\\{code(?::[^}]*)?\\}/gi, '')\n        .replace(/\\{color(?::[^}]*)?\\}/gi, '')\n        .replace(/\\{noformat\\}/gi, '')\n        .replace(/\\u00a0/g, ' ')        \n        .replace(/\\n[ \\t]*\\n[ \\t]*\\n+/g, '\\n\\n')\n        .split('\\n')\n        .map(line => line.replace(/[ \\t]+$/g, ''))\n        .join('\\n')\n        .trim();\n}\n\nfunction pick(obj, ...keys) {\n    for (const key of keys) {\n        const value = obj[key];\n\n        if (\n            value !== undefined &&\n            value !== null &&\n            String(value).trim() !== ''\n        ) {\n            return value;\n        }\n    }\n\n    return '';\n}\n\nfunction parseNumber(value) {\n    const n = Number(value);\n    return Number.isFinite(n) ? n : 0;\n}\n\nfunction normalizeComments(row) {    \n    if (Array.isArray(row.Comments)) {\n        return row.Comments\n            .map((comment, index) => {\n                if (comment && typeof comment === 'object') {\n                    return {\n                        index: Number(comment.index ?? comment.comment_index ?? index) || index,\n                        text: cleanText(comment.text ?? comment.content ?? ''),\n                        author: cleanText(comment.author ?? comment.username ?? ''),\n                        created_at: comment.created_at ?? comment.createdAt ?? ''\n                    };\n                }\n\n                return {\n                    index,\n                    text: cleanText(comment),\n                    author: '',\n                    created_at: ''\n                };\n            })\n            .filter(comment => comment.text);\n    }\n\n}\n\nfunction normalizeAttachments(row) {\n    let raw = pick(row, 'Unified_Attachment_Context');\n    \n    if (Array.isArray(raw)) {\n        return raw\n            .map((attachment, index) => {\n                const source = cleanText(\n                    attachment?.source ??\n                    attachment?.filename ??\n                    attachment?.name ??\n                    ''\n                );\n\n                const type = cleanText(\n                    attachment?.type ?? 'Unknown'\n                );\n\n                const mimeType = cleanText(\n                    attachment?.mime_type ?? attachment?.mimeType ?? ''\n                );\n\n                const extractor = cleanText(\n                    attachment?.extractor ?? attachment?.extraction_method ?? 'unknown'\n                );\n\n                const content = cleanText(\n                    attachment?.content ?? attachment?.text ?? ''\n                );\n\n                return {\n                    attachment_id: Number(attachment?.attachment_id) || index + 1,\n                    name: source,\n                    type,\n                    mime_type: mimeType,\n                    extractor,\n                    content,\n                };\n            })\n            .filter(attachment => attachment.content);\n    }\n    \n    return [];\n}\n\nconst row = $input.first().json;\n\nconst issueId = String(\n    pick(row, 'IssueId', 'Issue id', 'issue_id')\n).trim();\n\nif (!issueId) {\n    throw new Error('IssueId is missing');\n}\n\nconst summary = cleanText(pick(row, 'Summary', 'summary'));\nconst description = cleanText(pick(row, 'Description', 'description'));\nconst votes = parseNumber(pick(row, 'Votes', 'votes'));\n\nconst comments = normalizeComments(row);\nconst attachments = normalizeAttachments(row);\n\nreturn [{\n    json: {\n        issue_id: issueId,\n        summary,\n        description,\n        votes,\n        comments,\n        attachments,\n        attachment_count: attachments.length,\n        comment_count: comments.length,\n        source: 'jira',\n        document_type: 'jira_issue',\n        schema_version: 2,\n    },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -176
+      ],
+      "id": "f422ce81-170a-4f54-822d-2158c4e2c896",
+      "name": "Prepare Jira Files Data"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "b69d2b7a-1e49-4663-b6a3-ccd7d7f885d6",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        0,
+        -176
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Prepare Jira Files Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Jira Files Data": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "60d7adbc-efb7-493a-bcc7-12d0b7f74846",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "nodeGroups": [],
+  "id": "9McLn4tnTQPllTDd",
+  "tags": []
+}

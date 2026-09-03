@@ -1,0 +1,411 @@
+{
+  "name": "Universal Jira RAG Pipeline",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ea496c03-aa92-4b9d-91eb-787ab2cf5b05",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/data/shared/Test1.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "87231816-e3da-483a-a3da-db7f3cbef668",
+      "name": "Read Jira Excel File"
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "020bbd09-bb8e-45d8-87f1-cfbf456d3f74",
+      "name": "Extract Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfor (const item of $input.all()) {\n    let comments = [];\n    let attachments = [];\n\n    for (const key in item.json) {\n        if (key.startsWith('Comment') && item.json[key]) {\n            comments.push(item.json[key]);\n        }\n        if (key.startsWith('Attachment') && item.json[key]) {\n            attachments.push(item.json[key]);\n        }\n    }\n\n    results.push({\n        json: {\n            Summary: item.json.Summary || '',\n            IssueId: item.json['Issue id'] || '',\n            IssueType: item.json['Issue Type'] || '',\n            Status: item.json.Status || '',\n            Description: item.json.Description || '',\n            Resolution: item.json.Resolution || '',\n            Comments: comments,\n            Attachments: attachments\n        }\n    });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "10fb5637-aeaf-4ef5-b540-9d27c945f874",
+      "name": "Dynamically Map Arrays"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "b3d6b823-fa64-4d00-bd74-9db552903f8e",
+      "name": "Loop Over Jira Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cond-attachments",
+              "leftValue": "={{ $json.Attachments.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            },
+            {
+              "id": "095f1400-1cc2-47ca-bd2f-70ee6bce45b2",
+              "leftValue": "={{ $json.Attachments }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1200,
+        384
+      ],
+      "id": "c5aa699e-84db-4c78-9d57-e95e47cf49b3",
+      "name": "Has Attachments?"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "pOUVRbKacyzFpmIy",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/pOUVRbKacyzFpmIy",
+          "cachedResultName": "Create Rag"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2032,
+        400
+      ],
+      "name": "Call General RAG 1",
+      "id": "141d6bec-6580-49fb-9af8-30646380c920"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1YyZH1fcT35A6L9y",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/1YyZH1fcT35A6L9y",
+          "cachedResultName": "Extract and Prepare Attachments"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Attachments": "={{ $json.Attachments }}"
+          },
+          "matchingColumns": [
+            "Attachments"
+          ],
+          "schema": [
+            {
+              "id": "Attachments",
+              "displayName": "Attachments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1488,
+        272
+      ],
+      "name": "Call Extract and Prepare Attachments",
+      "id": "0f2832f1-3c84-4ad7-b428-78be50c3e895"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $json.Summary }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "cond-3",
+              "leftValue": "={{ $json.IssueType }}",
+              "rightValue": "Bug",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "227cf99a-b7b8-4c90-b2e3-373747f65435",
+              "leftValue": "={{ $json.IssueId }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2b3bca2d-6239-49e6-8b3a-65242fd6756e",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Closed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "ec090868-c7ab-471c-9a9c-fc1eaea45f35",
+              "leftValue": "={{ $json.Description }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e28c37a8-d9b1-49f1-b183-8907a234227f",
+              "leftValue": "={{ $json.Resolution }}",
+              "rightValue": "Fixed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        0
+      ],
+      "id": "3d79536f-26e2-447b-ac8d-315d03cac1a0",
+      "name": "Filter Bugs"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mainItem = $items(\"Has Attachments?\")[0].json;\n\nconst attachmentItems = $input.all().flatMap(item => {\n    const value = item.json?.data;\n\n    if (Array.isArray(value)) {\n        return value;\n    }\n\n    return [item.json];\n});\n\nconst attachments = attachmentItems\n    .map((a, index) => {\n        const type = a.type || 'Unknown';\n        const source = a.source || '';\n\n        let extractor = 'unknown';\n\n        if (/ocr/i.test(type)) {\n            extractor = 'glm-ocr';\n        } else if (/pdf/i.test(type)) {\n            extractor = 'pdf-parser';\n        } else if (/text|code/i.test(type)) {\n            extractor = 'native-text';\n        } else if (/spreadsheet|excel|xls/i.test(type)) {\n            extractor = 'spreadsheet-parser';\n        }\n\n        const content = a.content || '';\n\n        return {\n            attachment_id: index + 1,\n\n\n            source,\n\n            type,\n\n            mime_type: a.mime_type || '',\n\n            extractor,\n\n            content,\n\n        };\n    })\n    .filter(a => a.content.trim() !== '');\n\n\nmainItem.Unified_Attachment_Context = attachments;\n\n\nreturn [{\n    json: mainItem\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        272
+      ],
+      "id": "4efe1127-3a4a-4524-92a8-9e464542f857",
+      "name": "Add Context to Parent Item"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read Jira Excel File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Jira Excel File": {
+      "main": [
+        [
+          {
+            "node": "Extract Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Fields": {
+      "main": [
+        [
+          {
+            "node": "Dynamically Map Arrays",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dynamically Map Arrays": {
+      "main": [
+        [
+          {
+            "node": "Filter Bugs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Jira Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Has Attachments?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Attachments?": {
+      "main": [
+        [
+          {
+            "node": "Call Extract and Prepare Attachments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call General RAG 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call General RAG 1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Jira Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Extract and Prepare Attachments": {
+      "main": [
+        [
+          {
+            "node": "Add Context to Parent Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Bugs": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Jira Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Context to Parent Item": {
+      "main": [
+        [
+          {
+            "node": "Call General RAG 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "db5efa43-8883-4ce9-97fd-51699a99186c",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "nodeGroups": [],
+  "id": "m5vJCLwY1QyeBKaR",
+  "tags": []
+}

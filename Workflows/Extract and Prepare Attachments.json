@@ -1,0 +1,775 @@
+{
+  "name": "Extract and Prepare Attachments",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "Attachments",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        352
+      ],
+      "id": "1848f361-049e-4f43-bf17-de4ac5e29308",
+      "name": "Split Attachments"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.Attachments }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -544,
+        224
+      ],
+      "id": "72f39dee-90c4-4e3e-8739-db75278f957f",
+      "name": "Read Binary to Memory"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3b9f0355-988b-4de6-a4e4-dcccbed5ce71",
+      "name": "Convert Image to Base64"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"glm-ocr\",\n    \"keep_alive\": 3600,\n    \"messages\": [{\n        \"role\": \"user\",\n        \"content\": \"Text Recognition: Extract all visible text from this image. Preserve error messages, exception names, stack traces, class names, method names, file names and line numbers. Return only the extracted text.\",\n        \"images\": [\"{{ $json.data }}\"]\n    }],\n    \"stream\": false\n}",
+        "options": {
+          "timeout": 10000000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "6d6a153f-9697-466a-a75f-872fa78cf838",
+      "name": "Ollama glm-ocr"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n    json: {\n        source: item.json.fileName || '',\n        type: 'Image (OCR)',\n        mime_type: item.json.mimeType,\n        content: item.json.message?.content || ''\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        16
+      ],
+      "id": "1b14121f-256e-4e5f-b2c7-243b4e4498d8",
+      "name": "Format Image Output"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        208
+      ],
+      "id": "cc3b9d86-be81-4356-9c84-e3985ec827eb",
+      "name": "Extract Raw Text"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n    json: {\n        source: item.json.fileName || '',\n        type: 'Plain Text / Code',\n        mime_type: 'text',\n        content: $json.data || ''\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        224
+      ],
+      "id": "a43ea79e-1fd8-4487-830a-360d1f6c09b2",
+      "name": "Format Text Output"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        512
+      ],
+      "id": "a385f92d-6986-4580-9fbd-e0968ccee1fd",
+      "name": "Extract PDF Data"
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        720
+      ],
+      "id": "9c59116b-30c7-4708-b17e-8b4c1e027846",
+      "name": "Extract Spreadsheet Data"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        352
+      ],
+      "id": "0e91d75e-fae3-4cf9-b8dc-07d96b6086df",
+      "name": "Aggregate All Extracted Context"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6dc30dfa-e07a-475d-b745-c2da6c5cda06",
+              "name": "Attachments",
+              "value": "={{ $json.Attachments.split(';').last() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -976,
+        352
+      ],
+      "id": "80cdbf82-6663-4825-8a74-468daf534035",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Attachments }}",
+                    "rightValue": "http",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notStartsWith"
+                    },
+                    "id": "4d95689f-5751-4344-9f13-158211bec27e"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cbd9d8b9-692c-4232-ba2d-f9f284553239",
+                    "leftValue": "={{ $json.Attachments }}",
+                    "rightValue": "http",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -800,
+        352
+      ],
+      "id": "bedb6de5-f8ce-4b56-8b90-e3ad9e54ba47",
+      "name": "Route by Local or Remote",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c2233092-f0a8-4d61-825f-9136907111e9"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "caf665da-0fa8-464f-8d72-a17041012f17",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "14bb5866-2d1b-4858-ae37-4e0d51e97b06",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6a90390d-0700-4436-a302-0f46ba620b49",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "spreadsheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        320
+      ],
+      "id": "0fd226c4-5153-4b0d-9b3d-4e86cbf981c4",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        16
+      ],
+      "id": "0e7abc90-c3ca-49de-9534-08dfe6fb38c0",
+      "name": "Merge Extracted Data with Image File Metadata"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        224
+      ],
+      "id": "3c973ba6-1888-495b-ab45-7573016700b6",
+      "name": "Merge Extracted Data with Text File Metadata"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        528
+      ],
+      "id": "bc4f75ab-c54a-40c0-9c64-b5d9ed8fc796",
+      "name": "Merge Extracted Data with PDF File Metadata"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        736
+      ],
+      "id": "4d316c4b-6deb-4e39-b274-9d1d1b89abb4",
+      "name": "Merge Extracted Data with Excel File Metadata"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Attachments }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -544,
+        480
+      ],
+      "id": "d84754f6-5f74-4c3d-9686-e3d9f6744429",
+      "name": "Get Attachment"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n    json: {\n        source: item.json.fileName || '',\n        type: 'PDF Document',\n        mime_type: 'application/pdf',\n        content: $json.text || ''\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        528
+      ],
+      "id": "401bf4fb-1b45-4c10-9550-a8a0c17ce0bc",
+      "name": "Format PDF Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n    json: {\n        source: item.json.fileName || '',\n        type: 'Spreadsheet',\n        mime_type: 'application/excel',\n        content: JSON.stringify($json)\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        736
+      ],
+      "id": "bbf0dbbc-1d96-48e4-b75f-701eb45e85d0",
+      "name": "Format Excel Output"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1136,
+        320
+      ],
+      "id": "bb815f8f-f935-43a6-9503-ede39847e95e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Attachments",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "5c7b7dc4-137a-4ce6-be08-872ae9848f96",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -1392,
+        352
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Split Attachments": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary to Memory": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Image to Base64": {
+      "main": [
+        [
+          {
+            "node": "Ollama glm-ocr",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama glm-ocr": {
+      "main": [
+        [
+          {
+            "node": "Merge Extracted Data with Image File Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Image Output": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Raw Text": {
+      "main": [
+        [
+          {
+            "node": "Merge Extracted Data with Text File Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Text Output": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Extract PDF Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Extracted Data with PDF File Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Spreadsheet Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Extracted Data with Excel File Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate All Extracted Context": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Route by Local or Remote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Local or Remote": {
+      "main": [
+        [
+          {
+            "node": "Read Binary to Memory",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Merge Extracted Data with Image File Metadata",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Convert Image to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Extracted Data with Text File Metadata",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Extract Raw Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Extracted Data with PDF File Metadata",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Extract PDF Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Extracted Data with Excel File Metadata",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Extract Spreadsheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Extracted Data with Image File Metadata": {
+      "main": [
+        [
+          {
+            "node": "Format Image Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Extracted Data with Text File Metadata": {
+      "main": [
+        [
+          {
+            "node": "Format Text Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Extracted Data with PDF File Metadata": {
+      "main": [
+        [
+          {
+            "node": "Format PDF Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Extracted Data with Excel File Metadata": {
+      "main": [
+        [
+          {
+            "node": "Format Excel Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Attachment": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format PDF Output": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Format Excel Output": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate All Extracted Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Split Attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c2d8884b-d75e-41d6-a4c4-9858c7d3cb9a",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "nodeGroups": [],
+  "id": "1YyZH1fcT35A6L9y",
+  "tags": []
+}

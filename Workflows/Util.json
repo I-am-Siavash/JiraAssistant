@@ -1,0 +1,56 @@
+{
+  "name": "Util",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "http://qdrant:6333/collections/jira_issue_rag_v1",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"vectors\": {\n    \"dense\": {\n      \"size\": 768,\n      \"distance\": \"Cosine\"\n    }\n  },\n  \"sparse_vectors\": {\n    \"bm25\": {\n      \"modifier\": \"idf\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f80c86f7-c225-47da-93cd-1dcf5cf688fe",
+      "name": "HTTP Request-Create Collection"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "http://qdrant:6333/collections/jira_issue_rag_v1/index",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"field_name\": \"issue_id\",\n  \"field_schema\": \"keyword\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        240
+      ],
+      "id": "33e4dd56-31da-45e8-91bb-61552742855f",
+      "name": "HTTP Request-Create Index"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "44a87dc0-e7bf-4c43-a918-9201d0b294d2",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "nodeGroups": [],
+  "id": "ukjpwxyY698qEfWs",
+  "tags": []
+}
