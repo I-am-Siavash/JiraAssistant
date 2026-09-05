@@ -61,7 +61,7 @@
     {
       "parameters": {
         "content": "این گرهsub-workflow، Prepare Jira Files Data را صدا میزند که کار cleaning و آماده سازی داده ها برای استفاده در سیستم RAG را انجام میدهد.\n",
-        "height": 368,
+        "height": 432,
         "width": 256
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -79,15 +79,15 @@
         "url": "http://qdrant:6333/collections/jira_issue_rag_v1/points?wait=true",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { points: [ { id: $('Chunk Jira Data').item.json.point_id, vector: { dense: $json.embeddings[0], bm25: { text: $('Chunk Jira Data').item.json.text, model: \"qdrant/bm25\" } }, payload: $('Chunk Jira Data').item.json.payload } ] } }}",
+        "jsonBody": "={{\n{\n  points: [\n    {\n      id: $('Chunk Jira Data').item.json.point_id,\n      vector: {\n        dense: $('Embedd with nomic-embed-text').item.json.embeddings[0],\n        bm25: {\n          text: $('Chunk Jira Data').item.json.text,\n          model: \"qdrant/bm25\"\n        }\n      },\n      payload: $('Chunk Jira Data').item.json.payload\n    }\n  ]\n}\n}}",
         "options": {
-          "timeout": 120000
+          "timeout": 10000000
         }
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1120,
+        1504,
         -176
       ],
       "id": "5268fe0f-a977-484e-bdf5-50392a628939",
@@ -115,7 +115,7 @@
     },
     {
       "parameters": {
-        "jsCode": "function cleanText(value) {\n    if (value == null) return '';\n\n    return String(value)\n        .replace(/\\r\\n?/g, '\\n')\n        .replace(/\\n[ \\t]*\\n[ \\t]*\\n+/g, '\\n\\n')\n        .split('\\n')\n        .map(line => line.replace(/[ \\t]+$/g, ''))\n        .join('\\n')\n        .trim();\n}\n\nfunction chunkText(text, maxChars = 1400, overlapChars = 160) {\n    text = cleanText(text);\n    if (!text) return [];\n    if (text.length <= maxChars) return [text];\n\n    const lines = text.split('\\n');\n    const chunks = [];\n    let current = [];\n    let currentLength = 0;\n\n    function pushCurrent() {\n        const value = current.join('\\n').trim();\n        if (value) chunks.push(value);\n    }\n\n    function makeOverlap(linesArray) {\n        let total = 0;\n        const out = [];\n\n        for (let i = linesArray.length - 1; i >= 0; i--) {\n            const lineLength = linesArray[i].length + 1;\n            if (out.length > 0 && total + lineLength > overlapChars) break;\n            out.unshift(linesArray[i]);\n            total += lineLength;\n            if (total >= overlapChars) break;\n        }\n\n        return out;\n    }\n\n    for (const line of lines) {        \n        if (line.length > maxChars) {\n            if (current.length) {\n                pushCurrent();\n                current = makeOverlap(current);\n                currentLength = current.join('\\n').length;\n            }\n\n            let start = 0;\n            while (start < line.length) {\n                const piece = line.slice(start, start + maxChars).trim();\n                if (piece) chunks.push(piece);\n                start += maxChars - Math.min(overlapChars, 200);\n            }\n\n            current = [];\n            currentLength = 0;\n            continue;\n        }\n\n        const addedLength = line.length + (current.length ? 1 : 0);\n\n        if (current.length && currentLength + addedLength > maxChars) {\n            pushCurrent();\n            current = makeOverlap(current);\n            currentLength = current.join('\\n').length;\n            \n            if (currentLength + 1 + line.length > maxChars) {\n                current = [line];\n                currentLength = line.length;\n                continue;\n            }\n        }\n\n        current.push(line);\n        currentLength += addedLength;\n    }\n\n    pushCurrent();\n    return chunks;\n}\n\nfunction hash32(str, seed) {\n    let h = seed >>> 0;\n\n    for (let i = 0; i < str.length; i++) {\n        h ^= str.charCodeAt(i);\n        h = Math.imul(h, 16777619) >>> 0;\n    }\n\n    return h >>> 0;\n}\n\nfunction stableUuid(key) {\n    const seeds = [\n        2166136261,\n        0x9e3779b9,\n        0x85ebca6b,\n        0xc2b2ae35,\n    ];\n\n    const parts = seeds.map(seed => {\n        return hash32(key, (2166136261 ^ seed) >>> 0)\n            .toString(16)\n            .padStart(8, '0');\n    });\n\n    const h = parts.join('');\n\n    return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20)}`;\n}\n\nconst issue = $input.first().json;\nconst chunks = [];\n\nconst baseContext = [\n    `Jira Issue ID: ${issue.issue_id}`,\n    issue.summary ? `Summary: ${issue.summary}` : '',\n].filter(Boolean).join('\\n');\n\nfunction addChunk(type, text, extra = {}) {\n    text = cleanText(text);\n    if (!text) return;\n\n    const partIndex = extra.part_index ?? extra.comment_chunk_index ?? extra.attachment_chunk_index ?? 0;\n    const sourceKey = extra.attachment_id ?? extra.comment_index ?? '';\n\n    const pointId = stableUuid(\n        `${issue.issue_id}|${type}|${sourceKey}|${partIndex}|${text}`\n    );\n\n    const payload = {\n        issue_id: issue.issue_id,\n        ...(issue.summary ? {\n            summary: issue.summary\n        } : {}),\n        votes: issue.votes,\n        source: issue.source,\n        document_type: issue.document_type,\n        schema_version: issue.schema_version,\n        chunk_type: type,\n        embedding_model: 'nomic-embed-text',\n        embedding_task: 'search_document',\n        ...extra,\n        text,\n    };\n\n    chunks.push({\n        point_id: pointId,\n        text,\n        chunk_type: type,\n        payload,\n    });\n}\n\naddChunk(\n    'overview',\n    [\n        baseContext\n    ].filter(Boolean).join('\\n')\n);\n\n// 2. Description.\nfor (const [index, part] of chunkText(issue.description).entries()) {\n    addChunk(\n        'description',\n        `${baseContext}\\n\\nDescription:\\n${part}`, {\n            part_index: index\n        }\n    );\n}\n\nfor (const attachment of issue.attachments || []) {\n    const attachmentHeader = [\n        baseContext,\n        `Attachment ID: ${attachment.attachment_id}`,\n        attachment.name ? `Attachment Name: ${attachment.name}` : '',\n        attachment.type ? `Attachment Type: ${attachment.type}` : '',\n        attachment.mime_type ? `MIME Type: ${attachment.mime_type}` : '',\n        attachment.extractor ? `Extraction Method: ${attachment.extractor}` : '',\n        '',\n        'Attachment Content:',\n    ].filter(Boolean).join('\\n');\n\n    const parts = chunkText(attachment.content);\n\n    for (const [index, part] of parts.entries()) {\n        addChunk(\n            'attachment',\n            `${attachmentHeader}\\n${part}`, {\n                attachment_id: attachment.attachment_id,\n                attachment_name: attachment.name || '',\n                attachment_type: attachment.type || 'Unknown',\n                attachment_mime_type: attachment.mime_type || '',\n                attachment_extractor: attachment.extractor || 'unknown',\n                attachment_chunk_index: index,\n            }\n        );\n    }\n}\n\nfor (const comment of issue.comments || []) {\n    const commentHeader = [\n        baseContext,\n        `Comment ${comment.index}:`,\n        '',\n    ].filter(Boolean).join('\\n');\n\n    const parts = chunkText(comment.text);\n\n    for (const [index, part] of parts.entries()) {\n        addChunk(\n            'comment',\n            `${commentHeader}${part}`, {\n                comment_index: comment.index,\n                comment_chunk_index: index,\n            }\n        );\n    }\n}\n\nconst total = chunks.length;\n\nfor (let i = 0; i < chunks.length; i++) {\n    chunks[i].payload.chunk_index = i;\n    chunks[i].payload.chunk_total = total;\n    chunks[i].payload.chunk_id = chunks[i].point_id;\n}\n\nreturn chunks.map(chunk => ({\n    json: chunk,\n}));"
+        "jsCode": "function cleanText(value) {\n    if (value == null) return '';\n\n    return String(value)\n        .replace(/\\r\\n?/g, '\\n')\n        .replace(/\\n[ \\t]*\\n[ \\t]*\\n+/g, '\\n\\n')\n        .split('\\n')\n        .map(line => line.replace(/[ \\t]+$/g, ''))\n        .join('\\n')\n        .trim();\n}\n\nfunction chunkText(text, maxChars = 1400, overlapChars = 160) {\n    text = cleanText(text);\n    if (!text) return [];\n    if (text.length <= maxChars) return [text];\n\n    const lines = text.split('\\n');\n    const chunks = [];\n    let current = [];\n    let currentLength = 0;\n\n    function pushCurrent() {\n        const value = current.join('\\n').trim();\n        if (value) chunks.push(value);\n    }\n\n    function makeOverlap(linesArray) {\n        let total = 0;\n        const out = [];\n\n        for (let i = linesArray.length - 1; i >= 0; i--) {\n            const lineLength = linesArray[i].length + 1;\n            if (out.length > 0 && total + lineLength > overlapChars) break;\n            out.unshift(linesArray[i]);\n            total += lineLength;\n            if (total >= overlapChars) break;\n        }\n\n        return out;\n    }\n\n    for (const line of lines) {        \n        if (line.length > maxChars) {\n            if (current.length) {\n                pushCurrent();\n                current = makeOverlap(current);\n                currentLength = current.join('\\n').length;\n            }\n\n            let start = 0;\n            while (start < line.length) {\n                const piece = line.slice(start, start + maxChars).trim();\n                if (piece) chunks.push(piece);\n                start += maxChars - Math.min(overlapChars, 200);\n            }\n\n            current = [];\n            currentLength = 0;\n            continue;\n        }\n\n        const addedLength = line.length + (current.length ? 1 : 0);\n\n        if (current.length && currentLength + addedLength > maxChars) {\n            pushCurrent();\n            current = makeOverlap(current);\n            currentLength = current.join('\\n').length;\n            \n            if (currentLength + 1 + line.length > maxChars) {\n                current = [line];\n                currentLength = line.length;\n                continue;\n            }\n        }\n\n        current.push(line);\n        currentLength += addedLength;\n    }\n\n    pushCurrent();\n    return chunks;\n}\n\nfunction hash32(str, seed) {\n    let h = seed >>> 0;\n\n    for (let i = 0; i < str.length; i++) {\n        h ^= str.charCodeAt(i);\n        h = Math.imul(h, 16777619) >>> 0;\n    }\n\n    return h >>> 0;\n}\n\nfunction stableUuid(key) {\n    const seeds = [\n        2166136261,\n        0x9e3779b9,\n        0x85ebca6b,\n        0xc2b2ae35,\n    ];\n\n    const parts = seeds.map(seed => {\n        return hash32(key, (2166136261 ^ seed) >>> 0)\n            .toString(16)\n            .padStart(8, '0');\n    });\n\n    const h = parts.join('');\n\n    return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20)}`;\n}\n\nconst issue = $input.first().json;\nconst chunks = [];\n\nconst baseContext = [\n    `Jira Issue ID: ${issue.Issue_id}`,\n    issue.Summary ? `Summary: ${issue.Summary}` : '',\n].filter(Boolean).join('\\n');\n\nfunction addChunk(type, text, extra = {}) {\n    text = cleanText(text);\n    if (!text) return;\n\n    const partIndex = extra.part_index ?? extra.comment_chunk_index ?? extra.attachment_chunk_index ?? 0;\n    const sourceKey = extra.attachment_id ?? extra.comment_index ?? '';\n\n    const pointId = stableUuid(\n        `${issue.Issue_id}|${type}|${sourceKey}|${partIndex}|${text}`\n    );\n\n    const payload = {\n        issue_id: issue.Issue_id,\n        ...(issue.Summary ? {\n            summary: issue.Summary\n        } : {}),\n        votes: issue.Votes,\n        source: issue.Source,\n        document_type: issue.Document_type,\n        schema_version: issue.Schema_version,\n        chunk_type: type,\n        embedding_model: 'nomic-embed-text',\n        embedding_task: 'search_document',\n        ...extra,\n        text,\n    };\n\n    chunks.push({\n        point_id: pointId,\n        text,\n        chunk_type: type,\n        payload,\n    });\n}\n\naddChunk(\n    'overview',\n    [\n        baseContext\n    ].filter(Boolean).join('\\n')\n);\n\n// 2. Description.\nfor (const [index, part] of chunkText(issue.Description).entries()) {\n    addChunk(\n        'description',\n        `${baseContext}\\n\\nDescription:\\n${part}`, {\n            part_index: index\n        }\n    );\n}\n\nfor (const attachment of issue.Attachments || []) {\n    const attachmentHeader = [\n        baseContext,\n        `Attachment ID: ${attachment.attachment_id}`,\n        attachment.name ? `Attachment Name: ${attachment.name}` : '',\n        attachment.type ? `Attachment Type: ${attachment.type}` : '',\n        attachment.mime_type ? `MIME Type: ${attachment.mime_type}` : '',\n        attachment.extractor ? `Extraction Method: ${attachment.extractor}` : '',\n        '',\n        'Attachment Content:',\n    ].filter(Boolean).join('\\n');\n\n    const parts = chunkText(attachment.content);\n\n    for (const [index, part] of parts.entries()) {\n        addChunk(\n            'attachment',\n            `${attachmentHeader}\\n${part}`, {\n                attachment_id: attachment.attachment_id,\n                attachment_name: attachment.name || '',\n                attachment_type: attachment.type || 'Unknown',\n                attachment_mime_type: attachment.mime_type || '',\n                attachment_extractor: attachment.extractor || 'unknown',\n                attachment_chunk_index: index,\n            }\n        );\n    }\n}\n\nfor (const comment of issue.Comments || []) {\n    const commentHeader = [\n        baseContext,\n        `Comment ${comment.index}:`,\n        '',\n    ].filter(Boolean).join('\\n');\n\n    const parts = chunkText(comment.text);\n\n    for (const [index, part] of parts.entries()) {\n        addChunk(\n            'comment',\n            `${commentHeader}${part}`, {\n                comment_index: comment.index,\n                comment_chunk_index: index,\n            }\n        );\n    }\n}\n\nconst total = chunks.length;\n\nfor (let i = 0; i < chunks.length; i++) {\n    chunks[i].payload.chunk_index = i;\n    chunks[i].payload.chunk_total = total;\n    chunks[i].payload.chunk_id = chunks[i].point_id;\n}\n\nreturn chunks.map(chunk => ({\n    json: chunk,\n}));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -132,7 +132,7 @@
         "url": "http://qdrant:6333/collections/jira_issue_rag_v1/points/delete?wait=true",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n    {\n        {\n            filter: {\n                must: [{\n                    key: \"issue_id\",\n                    match: {\n                        value: $('Start').item.json.IssueId\n                    }\n                }]\n            }\n        }\n    }\n}",
+        "jsonBody": "={{\n{\n  filter: {\n    must: [\n      {\n        key: \"issue_id\",\n        match: {\n          value: $json.Issue_id\n        }\n      }\n    ]\n  }\n}\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -143,12 +143,13 @@
       ],
       "id": "db7a1f78-58c0-4cfd-b6cb-dc60ab735ebd",
       "name": "Ingestion Idempotent Check",
-      "onError": "continueErrorOutput"
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "content": "این گره وظیفه Chunk کرد دیتاهای Issue را دارد.\nاین Chunking روی Comment ها، Attachment ها، Description و Summery انجام میشود.",
-        "height": 368
+        "height": 432
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -162,7 +163,7 @@
     {
       "parameters": {
         "content": "این گره وظیفه Embedding توسط مدل nomic-embed-text را دارد.",
-        "height": 368
+        "height": 432
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -176,7 +177,8 @@
     {
       "parameters": {
         "content": "این گره وظیفه حفظ Idempotency و حذف دیتای قبلی در صورتی که یک Issue بیش از یکبار پردازش شود را دارد.",
-        "height": 368
+        "height": 432,
+        "width": 608
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -190,16 +192,62 @@
     {
       "parameters": {
         "content": "این گره Dense و Sparse آماده شده برای ذخیر در Qdrant را برای ذخیره ارسال میکند.",
-        "height": 368
+        "height": 432
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1056,
+        1440,
         -368
       ],
       "id": "5eb193d4-a424-4b38-bbc9-f8929f5e649d",
       "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fce0f23c-1fd3-422a-a5fc-229a6a5e585e",
+              "leftValue": "={{ $json.error.status }}",
+              "rightValue": 404,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1104,
+        -176
+      ],
+      "id": "4c2d3491-dc6f-4a26-a0ae-a7a669be782a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $('Ingestion Idempotent Check').item.json.error.message }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -80
+      ],
+      "id": "ea46fa64-24d3-4f59-8bfd-0adb0e4f9f58",
+      "name": "Stop and Error"
     }
   ],
   "pinData": {
@@ -219,18 +267,12 @@
             "29/May/2023 7:25 AM;698877135425;We fixed this issue in Sourcetree 3.4.13Can be directly downloaded from https://product-downloads.atlassian.com/software/sourcetree/windows/ga/SourceTreeSetup-3.4.13.exe;;;"
           ],
           "Attachments": [
-            "13/Jan/2023 8:53 AM;698877135426;SOF.png;/data/shared/T1.txt"
+            "13/Jan/2023 8:53 AM;698877135425;SOF.png;/data/shared/SOF.png",
+            "13/Jan/2023 8:53 AM;698877135426;SOF.png;/data/shared/SOF-2.png",
+            "13/Jan/2023 8:53 AM;698877135426;SOF.png;/data/shared/T1.txt",
+            "13/Jan/2023 8:53 AM;698877135426;SOF.png;/data/shared/T1.pdf"
           ],
-          "Unified_Attachment_Context": [
-            {
-              "attachment_id": 1,
-              "source": "T1.txt",
-              "type": "Plain Text / Code",
-              "mime_type": "text",
-              "extractor": "native-text",
-              "content": "Test"
-            }
-          ]
+          "Unified_Attachment_Context": []
         }
       }
     ]
@@ -284,7 +326,26 @@
       "main": [
         [
           {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
             "node": "Store dense + BM25 vectors",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
             "type": "main",
             "index": 0
           }
@@ -298,7 +359,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "bf3e6571-fbfd-400e-9a4a-d010b0f008a4",
+  "versionId": "869ce11d-e36a-4420-815c-6600092cdd15",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

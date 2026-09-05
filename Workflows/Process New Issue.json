@@ -35,7 +35,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        608,
+        624,
         176
       ],
       "id": "133290dd-76a3-42fc-8c09-c1668e9cae66",
@@ -202,7 +202,7 @@
         "specifyBody": "json",
         "jsonBody": "={{ \n\n{\n    model: \"nomic-embed-text\",\n    input: [\n        \"search_query: \" + $json.semantic_query,\n        \"search_query: \" + $json.evidence_query\n    ],\n    truncate: true,\n    keep_alive: \"10m\"\n}\n\n}}",
         "options": {
-          "timeout": 1000000
+          "timeout": 10000000
         }
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -222,7 +222,7 @@
         "specifyBody": "json",
         "jsonBody": "={{ \n\n{\n    prefetch: [{\n            query: $json.embeddings[0],\n            using: \"dense\",\n            limit: 30\n        },\n        {\n            query: $json.embeddings[1],\n            using: \"dense\",\n            limit: 30\n        },\n        {\n            query: {\n                text: $('Prepare Query').first().json.bm25_query,\n                model: \"qdrant/bm25\"\n            },\n            using: \"bm25\",\n            limit: 30\n        }\n    ],\n    query: {\n        fusion: \"rrf\"\n    },\n    filter: $('Prepare Query').first().json.issue_id ?\n        {\n            must_not: [{\n                key: \"issue_id\",\n                match: {\n                    value: $('Prepare Query').first().json.issue_id\n                }\n            }]\n        } :\n        undefined,\n    limit: 20,\n    with_payload: true\n}\n\n}}",
         "options": {
-          "timeout": 1000000
+          "timeout": 10000000
         }
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -268,7 +268,7 @@
         "specifyBody": "json",
         "jsonBody": "={{ \n\n{\n    model: \"qwen3.5:4b\",\n    think: false,\n    stream: false,\n    messages: [{\n            role: \"system\",\n            content: \"You are a careful software root-cause-analysis assistant. Use only the supplied current issue and retrieved historical evidence. Never invent facts.\"\n        },\n        {\n            role: \"user\",\n            content: $json.llm_prompt\n        }\n    ],\n    options: {\n        temperature: 0.15,\n        num_predict: 1600,\n        num_ctx: 8192\n    },\n    keep_alive: \"10m\"\n}\n\n}}",
         "options": {
-          "timeout": 1000000
+          "timeout": 10000000
         }
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -608,7 +608,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "2a23237e-93d3-449b-95be-85b09173d0cd",
+  "versionId": "d4f484e7-3487-4739-8188-5b574012fe7a",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

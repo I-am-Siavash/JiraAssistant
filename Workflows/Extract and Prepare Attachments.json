@@ -50,7 +50,7 @@
         "url": "http://ollama:11434/api/chat",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n    \"model\": \"glm-ocr\",\n    \"keep_alive\": 3600,\n    \"messages\": [{\n        \"role\": \"user\",\n        \"content\": \"Text Recognition: Extract all visible text from this image. Preserve error messages, exception names, stack traces, class names, method names, file names and line numbers. Return only the extracted text.\",\n        \"images\": [\"{{ $json.data }}\"]\n    }],\n    \"stream\": false\n}",
+        "jsonBody": "={\n    \"model\": \"glm-ocr\",\n    \"keep_alive\": \"10m\",\n    \"messages\": [{\n        \"role\": \"user\",\n        \"content\": \"Text Recognition: Extract all visible text from this image. Preserve error messages, exception names, stack traces, class names, method names, file names and line numbers. Return only the extracted text.\",\n        \"images\": [\"{{ $json.data }}\"]\n    }],\n    \"stream\": false\n}",
         "options": {
           "timeout": 10000000
         }
@@ -1058,7 +1058,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "c3c8cadc-c157-4fa1-81e7-5843c2e55091",
+  "versionId": "472dc6ef-1df1-4d1f-87bc-bfcd71592a72",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

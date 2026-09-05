@@ -113,34 +113,6 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "pOUVRbKacyzFpmIy",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/pOUVRbKacyzFpmIy",
-          "cachedResultName": "Create Rag"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.2,
-      "position": [
-        1936,
-        288
-      ],
-      "name": "Call General RAG 1",
-      "id": "141d6bec-6580-49fb-9af8-30646380c920"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
           "value": "1YyZH1fcT35A6L9y",
           "mode": "list",
           "cachedResultUrl": "/workflow/1YyZH1fcT35A6L9y",
@@ -374,6 +346,58 @@
       ],
       "id": "9614cfb8-98cb-4b34-8e79-f104ce8cb2be",
       "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "pOUVRbKacyzFpmIy",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/pOUVRbKacyzFpmIy",
+          "cachedResultName": "Create Rag"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1936,
+        288
+      ],
+      "name": "Call Create Rag",
+      "id": "141d6bec-6580-49fb-9af8-30646380c920"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        -16
+      ],
+      "id": "75dc8597-099e-4bfd-9a09-600823a517a1",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log(\"All Jira Items Processed Successfully.\");\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        -16
+      ],
+      "id": "1c6155ab-746f-4508-9774-aaae00e14ca8",
+      "name": "Code in JavaScript"
     }
   ],
   "pinData": {},
@@ -424,7 +448,13 @@
     },
     "Loop Over Jira Items": {
       "main": [
-        [],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Has Attachments?",
@@ -445,18 +475,7 @@
         ],
         [
           {
-            "node": "Call General RAG 1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Call General RAG 1": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Jira Items",
+            "node": "Call Create Rag",
             "type": "main",
             "index": 0
           }
@@ -489,7 +508,29 @@
       "main": [
         [
           {
-            "node": "Call General RAG 1",
+            "node": "Call Create Rag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Create Rag": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Jira Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
             "type": "main",
             "index": 0
           }
@@ -503,7 +544,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "089bcf4b-069b-4333-bf77-d20b12be84e2",
+  "versionId": "c5f90fdb-923c-4de2-9c5e-8f4c31fe1dac",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },
