@@ -183,7 +183,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.all();\nif (input.length !== 1) throw new Error(`Expected exactly one Jira issue, received ${input.length}.`);\nconst row = input[0].json;\nconst issue_id = row.issue_id;\nconst summary = row.summary;\nconst description = row.description;\nconst comments = row.comments;\nconst attachments = row.attachments;\n\nconst mainParts = [\n    summary ? `Summary: ${summary}` : '',\n    description ? `Description:\\n${description}` : ''\n].filter(Boolean);\n\nconst evidenceParts = [];\nfor (const a of attachments) {\n    const meta = [a.name ? `Attachment Name: ${a.name}` : '', a.type ? `Attachment Type: ${a.type}` : '', a.mime_type ? `MIME Type: ${a.mime_type}` : '', a.extractor ? `Extraction Method: ${a.extractor}` : ''].filter(Boolean).join('\\n');\n    evidenceParts.push(`${meta}${meta ? '\\n' : ''}Attachment Content:\\n${a.content}`);\n}\nfor (const c of comments.slice(-5)) evidenceParts.push(`Comment ${c.index}:\\n${c.text}`);\n\nconst semantic_query = mainParts.join('\\n\\n').slice(0, 5500);\nlet evidence_query = evidenceParts.join('\\n\\n---\\n\\n').slice(0, 6500);\nif (!evidence_query) evidence_query = semantic_query;\nconst bm25_query = [semantic_query, evidence_query !== semantic_query ? `Technical Evidence:\\n${evidence_query}` : ''].filter(Boolean).join('\\n\\n').slice(0, 11000);\n\nreturn [{\n    json: {\n        issue_id,\n        summary,\n        description,\n        comments,\n        attachments,\n        semantic_query,\n        evidence_query,\n        bm25_query,\n        schema_version: 2\n    }\n}];"
+        "jsCode": "const input = $input.all();\nif (input.length !== 1) throw new Error(`Expected exactly one Jira issue, received ${input.length}.`);\nconst row = input[0].json;\nconst issue_id = row.Issue_id;\nconst summary = row.Summary;\nconst description = row.Description;\nconst comments = row.Comments;\nconst attachments = row.Attachments;\n\nconst mainParts = [\n    summary ? `Summary: ${summary}` : '',\n    description ? `Description:\\n${description}` : ''\n].filter(Boolean);\n\nconst evidenceParts = [];\nfor (const a of attachments) {\n    const meta = [a.name ? `Attachment Name: ${a.name}` : '', a.type ? `Attachment Type: ${a.type}` : '', a.mime_type ? `MIME Type: ${a.mime_type}` : '', a.extractor ? `Extraction Method: ${a.extractor}` : ''].filter(Boolean).join('\\n');\n    evidenceParts.push(`${meta}${meta ? '\\n' : ''}Attachment Content:\\n${a.content}`);\n}\nfor (const c of comments.slice(-5)) evidenceParts.push(`Comment ${c.index}:\\n${c.text}`);\n\nconst semantic_query = mainParts.join('\\n\\n').slice(0, 5500);\nlet evidence_query = evidenceParts.join('\\n\\n---\\n\\n').slice(0, 6500);\nif (!evidence_query) evidence_query = semantic_query;\nconst bm25_query = [semantic_query, evidence_query !== semantic_query ? `Technical Evidence:\\n${evidence_query}` : ''].filter(Boolean).join('\\n\\n').slice(0, 11000);\n\nreturn [{\n    json: {\n        issue_id,\n        summary,\n        description,\n        comments,\n        attachments,\n        semantic_query,\n        evidence_query,\n        bm25_query,\n        schema_version: 2\n    }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -608,7 +608,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "81f8c21f-0dbf-4714-9ba9-bc6c3841b4f0",
+  "versionId": "72e703a4-a4d7-4c47-bdc1-d46aab78c334",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },
