@@ -45,15 +45,15 @@
     {
       "parameters": {
         "content": "این sub-workflow برای ساخت سیستم RAG از Issue های موجود روی Jira به کار میرود.\nاسکیما ورودی این workflow شامل اطلاعات زیر است:\n\n\n  {\n    \"Summary\": \"Summary\",\n    \"IssueId\": 1234567,\n    \"IssueType\": \"Bug\",\n    \"Status\": \"Closed\",\n    \"Description\": \"Description\",\n    \"Resolution\": \"Fixed\",\n    \"Comments\": [\n      \"17/Aug/2022 1:23 PM;dd005ea95a30;Comment1;;;\",\n      \"07/Sep/2022 10:37 AM;698877135425;Comment2;;;\",\n\t  .\n\t  .\n\t  .\n    ],\n    \"Attachments\": [\n      \"13/Jan/2023 8:53 AM;698877135426;I1.png;/data/shared/I1.png\"\n\t  \"14/Jan/2023 8:53 AM;698877135427;image-2023-05-29-16-26-21-583.png;https://jira.tosan-solutions.com/secure/attachment/438860/image-2023-05-29-16-26-21-583.png\"\n    ],\n    \"Unified_Attachment_Context\": [\n      {\n        \"attachment_id\": 1,\n        \"source\": \"I1.png\",\n        \"type\": \"Image (OCR)\",\n        \"mime_type\": \"image/png\",\n        \"extractor\": \"glm-ocr\",\n        \"content\": \"....\"\n      }\n    ]\n  }\n\n\n---",
-        "height": 1312,
-        "width": 1696,
+        "height": 848,
+        "width": 912,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -240,
-        -1264
+        -976,
+        -608
       ],
       "id": "cfc1c701-d7ec-4e6a-81b2-5160e229c63b",
       "name": "Sticky Note"
@@ -143,7 +143,7 @@
       ],
       "id": "db7a1f78-58c0-4cfd-b6cb-dc60ab735ebd",
       "name": "Ingestion Idempotent Check",
-      "onError": "continueRegularOutput"
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -298,7 +298,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "9c2b4f1f-2148-4127-b367-288edf594655",
+  "versionId": "bf3e6571-fbfd-400e-9a4a-d010b0f008a4",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

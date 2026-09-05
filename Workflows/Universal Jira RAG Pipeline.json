@@ -362,15 +362,15 @@
     {
       "parameters": {
         "content": "پردازش اطلاعات Issue های قبلی Jira به صورت فایلی\n\n---",
-        "height": 736,
-        "width": 2384,
+        "height": 96,
+        "width": 336,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -208,
-        -224
+        -528,
+        0
       ],
       "id": "9614cfb8-98cb-4b34-8e79-f104ce8cb2be",
       "name": "Sticky Note6"
@@ -503,7 +503,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "5a08cd8e-153d-4212-9f1b-98be559c05d6",
+  "versionId": "089bcf4b-069b-4333-bf77-d20b12be84e2",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

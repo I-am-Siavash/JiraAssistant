@@ -424,15 +424,15 @@
     {
       "parameters": {
         "content": "پردازش و آماده سازی کامنت برای Issue جدید\n\n---",
-        "height": 464,
-        "width": 3456,
+        "height": 80,
+        "width": 326,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -112,
-        -96
+        -464,
+        192
       ],
       "id": "4a3eb5f2-e4f7-418a-a268-b54ac79ea428",
       "name": "Sticky Note9"
@@ -608,7 +608,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "72e703a4-a4d7-4c47-bdc1-d46aab78c334",
+  "versionId": "2a23237e-93d3-449b-95be-85b09173d0cd",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },
