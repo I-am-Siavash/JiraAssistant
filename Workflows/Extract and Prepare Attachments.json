@@ -9,7 +9,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -1184,
+        -1360,
         352
       ],
       "id": "1848f361-049e-4f43-bf17-de4ac5e29308",
@@ -23,8 +23,8 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1.1,
       "position": [
-        -544,
-        224
+        -688,
+        240
       ],
       "id": "72f39dee-90c4-4e3e-8739-db75278f957f",
       "name": "Read Binary to Memory"
@@ -37,8 +37,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        0,
-        0
+        -240,
+        -144
       ],
       "id": "3b9f0355-988b-4de6-a4e4-dcccbed5ce71",
       "name": "Convert Image to Base64"
@@ -57,24 +57,11 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        224,
-        0
+        -16,
+        -144
       ],
       "id": "6d6a153f-9697-466a-a75f-872fa78cf838",
       "name": "Ollama glm-ocr"
-    },
-    {
-      "parameters": {
-        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n    json: {\n        source: item.json.fileName || '',\n        type: 'Image (OCR)',\n        mime_type: item.json.mimeType,\n        content: item.json.message?.content || ''\n    }\n}));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        784,
-        16
-      ],
-      "id": "1b14121f-256e-4e5f-b2c7-243b4e4498d8",
-      "name": "Format Image Output"
     },
     {
       "parameters": {
@@ -84,8 +71,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        0,
-        208
+        -240,
+        96
       ],
       "id": "cc3b9d86-be81-4356-9c84-e3985ec827eb",
       "name": "Extract Raw Text"
@@ -97,8 +84,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        800,
-        224
+        432,
+        112
       ],
       "id": "a43ea79e-1fd8-4487-830a-360d1f6c09b2",
       "name": "Format Text Output"
@@ -111,8 +98,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        0,
-        512
+        -240,
+        608
       ],
       "id": "a385f92d-6986-4580-9fbd-e0968ccee1fd",
       "name": "Extract PDF Data"
@@ -125,8 +112,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        0,
-        720
+        -240,
+        832
       ],
       "id": "9c59116b-30c7-4708-b17e-8b4c1e027846",
       "name": "Extract Spreadsheet Data"
@@ -139,8 +126,8 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        1296,
-        352
+        880,
+        368
       ],
       "id": "0e91d75e-fae3-4cf9-b8dc-07d96b6086df",
       "name": "Aggregate All Extracted Context"
@@ -162,7 +149,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        -976,
+        -1136,
         352
       ],
       "id": "80cdbf82-6663-4825-8a74-468daf534035",
@@ -223,7 +210,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -800,
+        -912,
         352
       ],
       "id": "bedb6de5-f8ce-4b56-8b90-e3ad9e54ba47",
@@ -332,7 +319,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -304,
+        -464,
         320
       ],
       "id": "0fd226c4-5153-4b0d-9b3d-4e86cbf981c4",
@@ -347,11 +334,12 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        432,
-        16
+        208,
+        -144
       ],
       "id": "0e7abc90-c3ca-49de-9534-08dfe6fb38c0",
-      "name": "Merge Extracted Data with Image File Metadata"
+      "name": "Merge Extracted Data with Image File Metadata",
+      "disabled": true
     },
     {
       "parameters": {
@@ -362,8 +350,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        432,
-        224
+        208,
+        112
       ],
       "id": "3c973ba6-1888-495b-ab45-7573016700b6",
       "name": "Merge Extracted Data with Text File Metadata"
@@ -377,8 +365,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        448,
-        528
+        208,
+        592
       ],
       "id": "bc4f75ab-c54a-40c0-9c64-b5d9ed8fc796",
       "name": "Merge Extracted Data with PDF File Metadata"
@@ -392,8 +380,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        448,
-        736
+        208,
+        832
       ],
       "id": "4d316c4b-6deb-4e39-b274-9d1d1b89abb4",
       "name": "Merge Extracted Data with Excel File Metadata"
@@ -406,8 +394,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        -544,
-        480
+        -688,
+        496
       ],
       "id": "d84754f6-5f74-4c3d-9686-e3d9f6744429",
       "name": "Get Attachment"
@@ -419,8 +407,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        800,
-        528
+        432,
+        592
       ],
       "id": "401bf4fb-1b45-4c10-9550-a8a0c17ce0bc",
       "name": "Format PDF Output"
@@ -432,8 +420,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        800,
-        736
+        432,
+        832
       ],
       "id": "bbf0dbbc-1d96-48e4-b75f-701eb45e85d0",
       "name": "Format Excel Output"
@@ -445,8 +433,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        1136,
-        320
+        672,
+        336
       ],
       "id": "bb815f8f-f935-43a6-9503-ede39847e95e",
       "name": "Merge"
@@ -467,9 +455,263 @@
       "name": "Start",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "position": [
-        -1392,
+        -1568,
         352
       ]
+    },
+    {
+      "parameters": {
+        "content": "وظیفه خواندن اطلاعات Attachment ها بر عهده این Workflow است.\nابتدا فایلهای مربوط به Attachment ها خوانده میشوند؛ هر فایل میتواند روی دیسک ماشین local ذخیره شده باشد، یاد از سرور Jira دریافت شود.\nسپس بسته به نوع هر فایل، اطلاعات به روش مناسب آن استخراج شده، و در نهایت همه با هم ادغام میشوند.\nبرای تصویر، داده ها و متون داخل آن به روش OCR و با استفاده از  glm-ocr استخراج میشود.\n\n---",
+        "height": 1408,
+        "width": 3296,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        -368
+      ],
+      "id": "36b5940f-2740-402d-beea-7849c90d068d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "آماده سازی فیلد Attachments\n",
+        "height": 240,
+        "width": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        288
+      ],
+      "id": "b7c94efd-1b9d-4db2-badc-0d2097aa23a5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "تشخیص local یا remote بودن \n",
+        "height": 240,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        288
+      ],
+      "id": "bb4c15b0-4954-4526-97e3-8ef70c48ba05",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "خواندن فایلهای local",
+        "height": 224,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        176
+      ],
+      "id": "bbf40abd-758d-46b4-80d5-a8218007cf94",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "خواندن فایلهای remote\n",
+        "height": 240,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        416
+      ],
+      "id": "ccd1cc41-03ce-40c6-81e5-bdc4b9103b09",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "تشخیص نوع فایل \n",
+        "height": 288,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        256
+      ],
+      "id": "ac055aab-a282-4bb1-a5bf-3c5a2781df35",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "خواندن فایلهای تصویری",
+        "height": 256,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -208
+      ],
+      "id": "41057171-aa3a-4994-b3c6-c3914714c4b5",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "خواندن فایلهای متنی\n",
+        "height": 208,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        48
+      ],
+      "id": "63fa7584-5edb-4714-adfc-a31a0d8bb52f",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "خواندن فایلهای PDF",
+        "height": 224,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        544
+      ],
+      "id": "b7ee9319-32a6-47fb-91e1-1f760bd5b94a",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "خواندن فایلهای Excel",
+        "height": 240,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        768
+      ],
+      "id": "1c57ee17-663f-4e9a-91a4-45154571839e",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "انجام OCR برای استخراج متنها از تصویر",
+        "height": 256,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -208
+      ],
+      "id": "89836355-f18e-4f69-b916-38b90f81fc1f",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "ترکیب اطلاعات استخراج شده از فایل با متادیتای فایل",
+        "height": 256,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -208
+      ],
+      "id": "b78b9061-8799-47cc-9db3-f90750404b5f",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "ترکیب اطلاعات استخراج شده از فایل با متادیتای فایل",
+        "height": 240,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        48
+      ],
+      "id": "02693ac9-5050-4013-adcd-3d429e3ddcf4",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "ترکیب اطلاعات استخراج شده از فایل با متادیتای فایل",
+        "height": 224,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        544
+      ],
+      "id": "080bd32b-f3e3-4326-baac-081d448d1a7c",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "ترکیب اطلاعات استخراج شده از فایل با متادیتای فایل",
+        "height": 240,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        768
+      ],
+      "id": "61df0d2f-98ae-48ca-93a7-a27f944752a6",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "ترکیت تمام داده های مربوط به فایلهای Attachment \n",
+        "height": 288,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        592,
+        272
+      ],
+      "id": "a22290ab-8e48-4512-bd5d-39608f647c66",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n    json: {\n        source: item.json.fileName || '',\n        type: 'Image (OCR)',\n        mime_type: item.json.mimeType,\n        content: item.json.message?.content || ''\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        -144
+      ],
+      "id": "1b14121f-256e-4e5f-b2c7-243b4e4498d8",
+      "name": "Format Image Output"
     }
   ],
   "pinData": {},
@@ -512,17 +754,6 @@
         [
           {
             "node": "Merge Extracted Data with Image File Metadata",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Image Output": {
-      "main": [
-        [
-          {
-            "node": "Merge",
             "type": "main",
             "index": 0
           }
@@ -757,6 +988,17 @@
           }
         ]
       ]
+    },
+    "Format Image Output": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -765,7 +1007,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "c2d8884b-d75e-41d6-a4c4-9858c7d3cb9a",
+  "versionId": "189ebf1d-f245-47a3-8986-d4c193c1bc8f",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

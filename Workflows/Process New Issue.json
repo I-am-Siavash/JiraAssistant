@@ -121,7 +121,7 @@
       "typeVersion": 1.2,
       "position": [
         1056,
-        176
+        32
       ],
       "name": "Call Extract and Prepare Attachments",
       "id": "a5ca0863-3ca1-4425-afeb-d59675e943d4"
@@ -149,7 +149,7 @@
       "typeVersion": 1.2,
       "position": [
         1504,
-        176
+        32
       ],
       "name": "Call Prepare Jira Files Data",
       "id": "e92bf7f1-023f-4223-873c-a8de93a703c6"
@@ -176,7 +176,7 @@
       "typeVersion": 2,
       "position": [
         1280,
-        176
+        32
       ],
       "id": "8a453d23-bf50-4549-a884-e0fffe27cc48",
       "name": "Add Context to Parent Item"
@@ -189,7 +189,7 @@
       "typeVersion": 2,
       "position": [
         1728,
-        176
+        192
       ],
       "id": "4f65e75d-5ad1-4d28-ba6d-4c11cd611e01",
       "name": "Prepare Query"
@@ -209,7 +209,7 @@
       "typeVersion": 4.5,
       "position": [
         1952,
-        176
+        192
       ],
       "id": "f6d67473-18d6-47bc-867f-01cf3f2e55f7",
       "name": "Embed Query with nomic-embed-text"
@@ -229,7 +229,7 @@
       "typeVersion": 4.5,
       "position": [
         2176,
-        176
+        192
       ],
       "id": "38fc578f-efe1-4ebb-95fe-331b450b8518",
       "name": "Qdrant Hybrid Search"
@@ -242,7 +242,7 @@
       "typeVersion": 2,
       "position": [
         2400,
-        176
+        192
       ],
       "id": "20c7ceb2-08bd-42e3-bf20-97ff493d1185",
       "name": "Prepare Candidates for Rerank"
@@ -254,8 +254,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2624,
-        176
+        2640,
+        192
       ],
       "id": "76c1a88f-16ca-4ac4-859e-9902af4f13d9",
       "name": "Build Final LLM Context"
@@ -274,8 +274,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        2848,
-        176
+        2896,
+        192
       ],
       "id": "bc44a50c-3afc-4fb4-bfff-b783dfeadef0",
       "name": "Generate Root Cause Analysis"
@@ -287,11 +287,155 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3072,
-        176
+        3120,
+        192
       ],
       "id": "d43222f1-a262-4c20-b93e-f07290111313",
       "name": "Format Final RAG Result"
+    },
+    {
+      "parameters": {
+        "content": " خواندن فایل حاوی اطلاعات Issue ",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -16
+      ],
+      "id": "ebe8ed00-e3f5-4888-b613-02339714bda4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "استخراج فیلدهای مربوط به Issue",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -16
+      ],
+      "id": "9e52c173-1745-42f0-b741-2195b6e67ce2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "آماده سازی و ساخت فیلدهای مورد نیاز",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -16
+      ],
+      "id": "8147797d-a06b-4e5d-b7d8-dea23e2385d8",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "پردازش و آماده سازی اطلاعات فایلهای Attachment\n",
+        "height": 368,
+        "width": 864
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -16
+      ],
+      "id": "91476698-5068-4152-8ac9-931fd8ff1f3c",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "آماده سازی کوئری مورد نباز جهت کوئری دیتا از RAG و انجام جستجو در دیتابیس",
+        "height": 368,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        -16
+      ],
+      "id": "a58d6422-e284-4387-a7e9-a1671e067ad1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "تجمیع نتایج Qdrant در سطح Issue، انتخاب کاندیداهای برتر و آماده‌سازی شواهد و Prompt برای مرحله Reranking با LLM",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        -16
+      ],
+      "id": "6bbbbe79-b1dd-4a6b-9f14-4740389e6472",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "ساخت پرامپت و دیتای مورد نیاز برای ارسال به LLM",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        -16
+      ],
+      "id": "a8a52d9e-0a6d-47de-af84-405d1f730fa2",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "ارسال دیتاهای لازم به LLM و دریافت پاسخ",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        -16
+      ],
+      "id": "c36202f5-9824-4e31-be19-667530198f6b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "آماده سازی خروجی برای ثبت روی Issue\n",
+        "height": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        -16
+      ],
+      "id": "8cc09142-bb6e-4c96-a25b-04cf05a6f70e",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "پردازش و آماده سازی کامنت برای Issue جدید\n\n---",
+        "height": 464,
+        "width": 3456,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -96
+      ],
+      "id": "4a3eb5f2-e4f7-418a-a268-b54ac79ea428",
+      "name": "Sticky Note9"
     }
   ],
   "pinData": {},
@@ -338,7 +482,13 @@
             "index": 0
           }
         ],
-        []
+        [
+          {
+            "node": "Prepare Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Call Extract and Prepare Attachments": {
@@ -458,7 +608,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "15713b64-362b-4103-af3a-bdb8918c22ed",
+  "versionId": "81f8c21f-0dbf-4714-9ba9-bc6c3841b4f0",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

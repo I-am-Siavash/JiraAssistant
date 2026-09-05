@@ -8,7 +8,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        208,
+        224,
         -176
       ],
       "id": "f422ce81-170a-4f54-822d-2158c4e2c896",
@@ -26,6 +26,22 @@
         0,
         -176
       ]
+    },
+    {
+      "parameters": {
+        "content": "این sub-workflow وظیفه Cleaning و آماده سازی دیتاهای لازم برای استفاده در بخش RAG و LLM سیستم را دارد.\nورودی شامل اطلاعات Issue و اطلاعات آماده شده Attachment ها است.\n\n---\n",
+        "height": 272,
+        "width": 688,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -288
+      ],
+      "id": "e0d95ceb-413e-41bc-9b23-88d72b3298c0",
+      "name": "Sticky Note"
     }
   ],
   "pinData": {},
@@ -53,7 +69,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "60d7adbc-efb7-493a-bcc7-12d0b7f74846",
+  "versionId": "23c049b2-caea-400a-a803-ec9887578a23",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

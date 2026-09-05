@@ -6,7 +6,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        0,
+        -144,
         0
       ],
       "id": "ea496c03-aa92-4b9d-91eb-787ab2cf5b05",
@@ -20,7 +20,7 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1.1,
       "position": [
-        208,
+        48,
         0
       ],
       "id": "87231816-e3da-483a-a3da-db7f3cbef668",
@@ -34,7 +34,7 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        432,
+        288,
         0
       ],
       "id": "020bbd09-bb8e-45d8-87f1-cfbf456d3f74",
@@ -47,7 +47,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        656,
+        528,
         0
       ],
       "id": "10fb5637-aeaf-4ef5-b540-9d27c945f874",
@@ -60,7 +60,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1088,
+        1008,
         0
       ],
       "id": "b3d6b823-fa64-4d00-bd74-9db552903f8e",
@@ -103,8 +103,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1200,
-        384
+        1120,
+        272
       ],
       "id": "c5aa699e-84db-4c78-9d57-e95e47cf49b3",
       "name": "Has Attachments?"
@@ -131,8 +131,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        2032,
-        400
+        1936,
+        288
       ],
       "name": "Call General RAG 1",
       "id": "141d6bec-6580-49fb-9af8-30646380c920"
@@ -173,8 +173,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        1488,
-        272
+        1408,
+        160
       ],
       "name": "Call Extract and Prepare Attachments",
       "id": "0f2832f1-3c84-4ad7-b428-78be50c3e895"
@@ -254,7 +254,7 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.3,
       "position": [
-        880,
+        752,
         0
       ],
       "id": "3d79536f-26e2-447b-ac8d-315d03cac1a0",
@@ -267,11 +267,113 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1712,
-        272
+        1632,
+        160
       ],
       "id": "4efe1127-3a4a-4524-92a8-9e464542f857",
       "name": "Add Context to Parent Item"
+    },
+    {
+      "parameters": {
+        "content": " خواندن فایل حاوی اطلاعات Issue ها",
+        "height": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "35b820cc-fd4b-46b7-ae6b-8f3a0f328f85",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "استخراج فیلدهای مربوط به Issue",
+        "height": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -128
+      ],
+      "id": "20d220cc-0d95-44c0-8c3e-5458d08cd5c6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "آماده سازی و ساخت فیلدهای مورد نیاز",
+        "height": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -128
+      ],
+      "id": "f21f7086-9267-4c90-9a0a-f0036ac0d079",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "انتخاب Issue های از نوع باگ",
+        "height": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -128
+      ],
+      "id": "efc8821b-ba1c-4a9b-9ee2-798da7b3dc80",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "پردازش و آماده سازی اطلاعات فایلهای Attachment\n",
+        "height": 608,
+        "width": 880
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        944,
+        -128
+      ],
+      "id": "0b2ec2a5-2159-42c0-8e7a-548ebaf81465",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "ارسال اطلاعات Issue و Attachment ها به sub-workflow ساخت سیستم RAG",
+        "height": 336,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        144
+      ],
+      "id": "1511622f-8ad3-4cca-acd9-2f8a9a8023f5",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "پردازش اطلاعات Issue های قبلی Jira به صورت فایلی\n\n---",
+        "height": 736,
+        "width": 2384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -224
+      ],
+      "id": "9614cfb8-98cb-4b34-8e79-f104ce8cb2be",
+      "name": "Sticky Note6"
     }
   ],
   "pinData": {},
@@ -401,7 +503,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "db5efa43-8883-4ce9-97fd-51699a99186c",
+  "versionId": "440aa462-a139-4803-974f-b132d8982380",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },
