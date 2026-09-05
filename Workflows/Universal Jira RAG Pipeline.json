@@ -14,7 +14,7 @@
     },
     {
       "parameters": {
-        "fileSelector": "/data/shared/Test1.xlsx",
+        "fileSelector": "/data/shared/Training.xlsx",
         "options": {}
       },
       "type": "n8n-nodes-base.readWriteFile",
@@ -503,7 +503,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "440aa462-a139-4803-974f-b132d8982380",
+  "versionId": "5a08cd8e-153d-4212-9f1b-98be559c05d6",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },
